@@ -1,21 +1,95 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Login</title>
+    <title>Login | QME Rating</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+      .login-box {
+        background: #fff;
+        padding: 2em;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+      }
+      h2 {
+        margin-top: 0;
+      }
+      input {
+        width: 100%;
+        padding: 0.75em;
+        margin-top: 0.5em;
+        margin-bottom: 1em;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 1em;
+      }
+      button {
+        width: 100%;
+        padding: 0.75em;
+        background-color: #0066ff;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 1em;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #004ccc;
+      }
+      .google-button {
+        background: white;
+        color: #444;
+        border: 1px solid #ccc;
+        margin-top: 1em;
+      }
+      .google-button:hover {
+        background: #f1f1f1;
+      }
+      .links {
+        margin-top: 1em;
+        font-size: 0.9em;
+      }
+      .links a {
+        color: #0066ff;
+        text-decoration: none;
+      }
+      .error {
+        color: red;
+        font-size: 0.9em;
+        margin-bottom: 0.5em;
+      }
+    </style>
   </head>
   <body>
-    <h2>Login</h2>
-    <input type="email" id="email" placeholder="Email"><br>
-    <input type="password" id="password" placeholder="Password"><br>
-    <button onclick="login()">Login</button>
+    <div class="login-box">
+      <h2>Log In</h2>
+      <div class="error" id="error"></div>
+      <input type="email" id="email" placeholder="Email">
+      <input type="password" id="password" placeholder="Password">
+      <button onclick="login()">Log In</button>
+      <button class="google-button" onclick="loginWithGoogle()">Sign in with Google</button>
+
+      <div class="links">
+        <a href="#" onclick="resetPassword()">Forgot Password?</a><br>
+        <a href="#" onclick="alert('Sign-up coming soon!')">Don’t have an account? Sign up</a>
+      </div>
+    </div>
 
     <script type="module">
-      // Import Firebase modules
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-      import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
-      import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics.js";
+      import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
-      // Your Firebase config
       const firebaseConfig = {
         apiKey: "AIzaSyCZYBOlEcB2FutON4B3MyefUTvV-rqR4VE",
         authDomain: "qme-rating.firebaseapp.com",
@@ -26,23 +100,52 @@
         measurementId: "G-WPEY4WRLEE"
       };
 
-      // Initialize Firebase
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
-      const analytics = getAnalytics(app);
 
-      // Login function
+      // Email/Password login
       window.login = async function () {
         const email = document.getElementById("email").value;
         const password = document.getElementById("password").value;
+        const errorBox = document.getElementById("error");
+        errorBox.textContent = "";
 
         try {
           await signInWithEmailAndPassword(auth, email, password);
-          // ✅ Redirect to protected Carrd page
-          window.location.href = "https://qmerating2.carrd.co"; // <-- change this
+          redirectAfterLogin();
         } catch (error) {
-          alert("Login failed: " + error.message);
+          errorBox.textContent = error.message;
         }
+      };
+
+      // Google login
+      window.loginWithGoogle = async function () {
+        const provider = new GoogleAuthProvider();
+        try {
+          await signInWithPopup(auth, provider);
+          redirectAfterLogin();
+        } catch (error) {
+          alert("Google login failed: " + error.message);
+        }
+      };
+
+      // Forgot password
+      window.resetPassword = async function () {
+        const email = prompt("Enter your email to reset your password:");
+        if (!email) return;
+        try {
+          await sendPasswordResetEmail(auth, email);
+          alert("Password reset email sent.");
+        } catch (error) {
+          alert("Error: " + error.message);
+        }
+      };
+
+      // Redirect function
+      function redirectAfterLogin() {
+        const params = new URLSearchParams(window.location.search);
+        const redirect = params.get("redirect") || "https://qmerating2.carrd.co";
+        window.location.href = redirect;
       }
     </script>
   </body>
