@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login</title>
+  </head>
+  <body>
+    <h2>Login</h2>
+    <input type="email" id="email" placeholder="Email"><br>
+    <input type="password" id="password" placeholder="Password"><br>
+    <button onclick="login()">Login</button>
+
+    <script type="module">
+      // Import Firebase modules
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+      import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics.js";
+
+      // Your Firebase config
+      const firebaseConfig = {
+        apiKey: "AIzaSyCZYBOlEcB2FutON4B3MyefUTvV-rqR4VE",
+        authDomain: "qme-rating.firebaseapp.com",
+        projectId: "qme-rating",
+        storageBucket: "qme-rating.firebasestorage.app",
+        messagingSenderId: "644583789564",
+        appId: "1:644583789564:web:a425437acebda38b4ed879",
+        measurementId: "G-WPEY4WRLEE"
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const analytics = getAnalytics(app);
+
+      // Login function
+      window.login = async function () {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          // ✅ Redirect to protected Carrd page
+          window.location.href = "https://qmerating2.carrd.co"; // <-- change this
+        } catch (error) {
+          alert("Login failed: " + error.message);
+        }
+      }
+    </script>
+  </body>
+</html>
